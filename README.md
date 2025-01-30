@@ -223,7 +223,7 @@ You’ve:
 
 .  Fetched news from the **News API** (headlines or by keyword).
 
-.  Saved data to **CSV/Excel**.
+.  Saved data to **CSV/Excel**. (Check it out at example_data, news_results.xlsx & extracted_articles.xlsx)
 
 .  Crawled each **article URL**, extracting and storing full text in a new file.
 
