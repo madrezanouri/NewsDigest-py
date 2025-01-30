@@ -29,6 +29,7 @@ pip install newsapi-python
 Save the code below as fetch_and_save_news.py. It prompts you to choose:
 
 .  Top Headlines by source (e.g., bbc-news)
+
 .  Everything by keyword (e.g., world war 3)
 
 It then retrieves the articles and saves them to **CSV** and **Excel**.
