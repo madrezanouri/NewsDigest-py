@@ -222,7 +222,9 @@ if __name__ == "__main__":
 You’ve:
 
 .  Fetched news from the **News API** (headlines or by keyword).
+
 .  Saved data to **CSV/Excel**.
+
 .  Crawled each **article URL**, extracting and storing full text in a new file.
 
 You can now use extracted_articles.xlsx for text analysis, NLP projects, or whatever you need. Enjoy!
