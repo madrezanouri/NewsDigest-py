@@ -129,3 +129,100 @@ if __name__ == "__main__":
     API_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
     fetch_and_save_news(API_KEY)
 ```
+
+
+# Step 4: Crawl Each Article URL to Extract Full Text
+
+Next, save this code as crawl_urls.py. It reads the Excel file produced above, crawls each link, and appends the article text as a new column.
+
+```
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+def extract_article_text_from_url(url):
+    """
+    Given a URL, fetch the page content and return a simple extracted text.
+    Returns an empty string if there's any error.
+    """
+    try:
+        # 1) GET request to fetch the page
+        headers = {
+            # Some sites block default requests; adding a user-agent helps.
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/58.0.3029.110 Safari/537.3"
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()  # Raise HTTPError if status != 200
+
+        # 2) Parse HTML with BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # 3) Extract text from <p> tags (basic approach)
+        #    You can refine for specific site structures.
+        paragraphs = soup.find_all('p')
+        # Join them into a single text
+        article_text = ' '.join(p.get_text(strip=True) for p in paragraphs)
+
+        return article_text
+
+    except Exception as e:
+        print(f"Error extracting from {url}: {e}")
+        return ""
+
+def crawl_articles_from_excel(input_excel, output_excel):
+    """
+    Reads URLs from the input Excel file (expects a column named 'url'),
+    extracts article text, and saves the results to output Excel.
+    """
+    # 1) Read the file into a DataFrame
+    df = pd.read_excel(input_excel)
+    
+    # If you're using CSV instead:
+    # df = pd.read_csv("news_results.csv")
+    
+    # Ensure 'url' column exists
+    if 'url' not in df.columns:
+        print(f"Error: No 'url' column found in {input_excel}.")
+        return
+
+    # 2) Create a new column 'article_text'
+    article_texts = []
+    
+    for idx, row in df.iterrows():
+        url = row['url']
+        if not isinstance(url, str) or not url.startswith("http"):
+            # Skip if invalid URL
+            article_texts.append("")
+            continue
+        
+        print(f"Crawling URL {idx+1}/{len(df)}: {url}")
+        article_text = extract_article_text_from_url(url)
+        article_texts.append(article_text)
+    
+    # 3) Add the new column to the DataFrame
+    df['article_text'] = article_texts
+    
+    # 4) Save to a new Excel file
+    df.to_excel(output_excel, index=False)
+    print(f"Extraction complete. Results saved to {output_excel}.")
+
+if __name__ == "__main__":
+    # Example usage
+    input_file = "news_results2.xlsx"   # or "news_results.csv"
+    output_file = "extracted_articles.xlsx"
+    
+    crawl_articles_from_excel(input_file, output_file)
+```
+
+
+**That’s It!**
+
+You’ve:
+
+.  Fetched news from the **News API** (headlines or by keyword).
+.  Saved data to **CSV/Excel**.
+.  Crawled each **article URL**, extracting and storing full text in a new file.
+
+You can now use extracted_articles.xlsx for text analysis, NLP projects, or whatever you need. Enjoy!
